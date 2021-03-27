@@ -1,4 +1,3 @@
-from colorama import Fore, Style
 from colorama import init as colorama_init
 from datetime import datetime
 from dateutil import relativedelta
@@ -14,6 +13,10 @@ TODAY = datetime.now()
 
 colorama_init()
 # print(colored('hello', 'green'))
+
+"""
+TODO: error handling for no node modules packages found
+"""
 
 def find_old_projects(weeks):
     recents = []
@@ -50,11 +53,11 @@ def trash_nms(nm_paths):
         print(f"### Sending {path} to trash ###")
         send2trash(path)
 
+hash_hr  = "\n######################################################\n"
+welcome = "\n" + colored("Welcome to the node_module spring cleaner ", "yellow") + colored("v0.1", "blue", attrs=["underline"]) + "\n"
 def main():
-    starting_prompt = """Welcome to the node_module spring cleaner.
-How many weeks of node modules do you want to keep? (Default 12)
-> """
-    weeks = input(starting_prompt)
+    print(hash_hr + welcome + hash_hr)
+    weeks = input("How many weeks of node modules do you want to keep? (Default 12)\n> ")
     try:
         weeks = int(weeks)
     except ValueError:
@@ -68,16 +71,19 @@ How many weeks of node modules do you want to keep? (Default 12)
         if nm: 
             # print(f"Found {nm}")
             nm_paths.append(nm)
-    print(f"\n##### Found " + colored(str(len(nm_paths)), 'blue', attrs=["bold"]) + " old node_modules directories! #####")
+    if len(nm_paths) == 0:
+        raise SystemExit(colored('No node_modules directories found! Exiting...', 'red'))
+    print(f"\n##### Found " + colored(str(len(nm_paths)), 'blue', attrs=["bold"]) + " old node_modules directories #####")
     for nm in nm_paths:
         print(nm)
-    send_to_trash = input(f"Send {len(nm_paths)} directories to the trash? y/n \n> ")
-    if send_to_trash.lower().strip() in ("y", "yes"):
+    response = input(f"Send {len(nm_paths)} directories to the trash? y/n \n> ")
+    if response.lower().strip() in ("y", "yes"):
         # trash_nms(nm_paths) 
         print("This is where trash_nms runs")
-        raise SystemExit("Files moved to trash")
+        raise SystemExit(f"{len(nm_paths)} directories successfully moved to trash\n Exiting...")
     else: 
         raise SystemExit("Exiting...")
+
 
 if __name__ == "__main__":
     main()
