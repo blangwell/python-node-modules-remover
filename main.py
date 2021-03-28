@@ -3,8 +3,11 @@ from datetime import datetime
 from dateutil import relativedelta
 import math
 import os
+from progress.spinner import Spinner
 from send2trash import send2trash
 from termcolor import colored
+import time
+import threading
 
 CWD = os.getcwd()
 ROOT_PATH = os.path.abspath(CWD)
@@ -26,27 +29,42 @@ def get_nm_path(directory):
     for dirpath, dirnames, filenames in os.walk(directory):
         if "node_modules" in dirnames:
             results.append(os.path.join(dirpath, "node_modules"))
-    # print(ROOT_PATH + "/" + results[0] if len(results) > 0 else "no node modules found")
     if len(results) > 0:
         # results[0] will be root node_modules dir
         return ROOT_PATH + "/" + results[0]
 
 def find_nm_dirs(dirs):
-    print("Searching for old node_modules...")
+    loading = True
+
+    def spinner():
+        spinner = Spinner(colored("Searching for old node module dirs ", "cyan"))
+        while loading:
+            time.sleep(.2)
+            spinner.next()
+    spin_thread = threading.Thread(target=spinner)
+    spin_thread.start()
+
     nm_paths = []
     for folder in dirs:
         nm = get_nm_path(folder)
         if nm: 
             nm_paths.append(nm)
+
+    loading = False
+    spin_thread.join()
     if len(nm_paths) == 0:
-        raise SystemExit(colored('No node_modules directories found! Exiting...', 'red'))
-    print(f"\n##### Found " + colored(str(len(nm_paths)), 'blue', attrs=["bold"]) + " old node_modules directories #####")
+        raise SystemExit(colored("\nNo node_modules found! Make sure you are running this script in a directory that contains npm project subdirectories.\nExiting...", "red"))
+
+    hash_hr = colored("########", "blue")
+    count = colored(str(len(nm_paths)), 'cyan', attrs=["bold"])
+    found = colored(" Found ", "green") + count + colored(" old node_modules directories ", "green")
+    print("\n" + hash_hr + found + hash_hr)
     for nm in nm_paths:
         print(nm)
     return nm_paths
 
 def get_weeks():
-    weeks = input("How many weeks of node modules do you want to keep? (Default 12)\n> ")
+    weeks = input(colored("How many weeks of node modules do you want to keep? (Default 12)\n", "yellow") + "> ")
     try:
         weeks = int(weeks)
     except ValueError:
@@ -57,17 +75,16 @@ def get_weeks():
 # loop through the nm_filepaths and send each directory to the trash
 def trash_nms(nm_paths):
     for path in nm_paths:
-        print(f"### Sending {path} to trash ###")
-        send2trash(path)
+        print(colored(f"Trashing {path}", "cyan"))
+        # send2trash(path)
 
 def trash_yn(dirs):
-    response = input(f"Send {len(dirs)} directories to the trash? y/n \n> ")
+    response = input(colored(f"Send {len(dirs)} directories to the trash? y/n \n", "yellow") + "> ")
     if response.lower().strip() in ("y", "yes"):
-        # trash_nms(dirs) 
-        print("This is where trash_nms runs")
-        raise SystemExit(f"{len(dirs)} directories successfully moved to trash\nExiting...")
+        trash_nms(dirs) 
+        raise SystemExit(colored(f"{len(dirs)} directories successfully moved to trash\n", "green") + "Exiting...")
     else: 
-        raise SystemExit("Exiting...")
+        raise SystemExit(colored("No directories moved. \n", "cyan") + "Exiting...")
 
 def welcome():
     hash_hr  = colored("\n######################################################\n", "blue")
@@ -80,7 +97,6 @@ def main():
     old_projects = find_old_projects(weeks)
     nm_paths = find_nm_dirs(old_projects)
     trash_yn(nm_paths)
-
 
 if __name__ == "__main__":
     main()
