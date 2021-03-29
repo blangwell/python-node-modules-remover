@@ -84,7 +84,7 @@ def trash_yn(dirs):
         trash_nms(dirs) 
         raise SystemExit(colored(f"{len(dirs)} directories successfully moved to trash\n", "green") + "Exiting...")
     else: 
-        raise SystemExit(colored("No directories moved. \n", "cyan") + "Exiting...")
+        raise SystemExit(colored("No directories moved to trash. \n", "cyan") + "Exiting...")
 
 def welcome():
     hash_hr  = colored("\n######################################################\n", "blue")
