@@ -78,7 +78,7 @@ def get_weeks():
 def trash_nms(nm_paths):
     for path in nm_paths:
         print(colored(f"Trashing {path}", "cyan"))
-        # send2trash(path)
+        send2trash(path)
 
 def trash_yn(dirs):
     response = input(colored(f"Send {len(dirs)} directories to the trash? y/n \n", "yellow") + "> ")
@@ -90,7 +90,7 @@ def trash_yn(dirs):
 
 def welcome():
     hash_hr  = colored("\n######################################################\n", "blue")
-    welcome = "\n" + colored("Welcome to the node_module spring cleaner ", "green") + colored("v0.1", "cyan", attrs=["underline"]) + "\n"
+    welcome = "\n" + colored("Welcome to the Python node_module remover tool ", "green") + colored("v0.1", "cyan", attrs=["underline"]) + "\n"
     print(hash_hr + welcome + hash_hr)
 
 def main():
