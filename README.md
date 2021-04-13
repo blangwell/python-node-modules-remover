@@ -5,9 +5,12 @@ Clone this repository. `cd` into the directory and install dependencies:
 ```
 $ pip install -r requirements.txt
 ``` 
-then make the script executable with:
+Then make the script executable with:
 ```
 $ chmod -x module_remover.py
 ```
-
-The script is built to be run from within a directory containing npm project subdirectories. Specify how many weeks of node_modules you want to save. The script will gather old projects' `node_module/` directories and prepare them to be sent to the trash. 
+Navigate to the parent directory that contains your Node projects and run the script with:
+```
+$ path/to/module_remover.py
+```
+The script checks your project directories to determine when they were last accessed. Projects that haven't been accessed within the timeframe you specify will have their `node_modules` directories prepared to be moved to the trash. 
