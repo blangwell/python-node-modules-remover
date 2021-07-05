@@ -16,6 +16,7 @@ CWD = os.getcwd()
 ROOT_PATH = os.path.abspath(CWD)
 SUB_DIRS = [sub for sub in os.listdir(CWD) if os.path.isdir(sub)]
 TODAY = datetime.now()
+HASH_HR = "\n######################################################\n"
 
 colorama_init()  # windows term color compatibility
 
@@ -51,8 +52,7 @@ def find_nm_dirs(dirs):
     loading = True
 
     def spinner():
-        spinner = Spinner(
-            colored("Searching for old node module dirs ", "cyan"))
+        spinner = Spinner("Searching for old node module dirs ")
         while loading:
             time.sleep(.2)
             spinner.next()
@@ -68,26 +68,27 @@ def find_nm_dirs(dirs):
     loading = False
     spin_thread.join()
     if len(nm_paths) == 0:
-        cprint("\nNo node_modules found! Make sure you are running this script in a directory that contains npm project subdirectories.\nExiting...", "red", file=sys.stderr)
-        # raise SystemExit(colored("\nNo node_modules found! Make sure you are running this script in a directory that contains npm project subdirectories.\nExiting...", "red"))
+        cprint("\nNo node_modules found!", "red", file=sys.stderr)
+        print("Make sure you are running this script in a directory that contains npm project subdirectories.\nExiting...")
+        sys.exit(1)
 
-    hash_hr = colored("########", "blue")
     count = colored(str(len(nm_paths)), 'cyan', attrs=["bold"])
-    found = colored(" Found ", "green") + count + \
-        colored(" old node_modules directories ", "green")
-    print("\n" + hash_hr + found + hash_hr)
+    found = f"Found {colored(count, 'cyan')} old node_modules directories"
+    print(f"\n{HASH_HR}\n{found}\n")
     for nm in nm_paths:
-        print(nm)
+        print(">" + nm)
+    print(HASH_HR)
     return nm_paths
 
 
 def get_weeks():
-    weeks = input("How many weeks of node modules do you want to keep? (Default 12)\n> ")
+    weeks = input(
+        "How many weeks of node modules do you want to keep? (Default 12)\n> ")
     try:
         weeks = int(weeks)
         return weeks
     except ValueError:
-        cprint("Unrecognized input, defaulting to 12 weeks.", "red", file=sys.stderr)
+        print(colored("Defaulting to 12 weeks...", "cyan"))
         return 12
 
 # loop through the nm_filepaths and send each directory to the trash
